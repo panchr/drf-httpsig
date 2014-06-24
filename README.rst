@@ -1,9 +1,9 @@
-===================================
-django-rest-framework-httpsignature
-===================================
+===========
+drf-httpsig
+===========
 
-.. image:: https://travis-ci.org/etoccalino/django-rest-framework-httpsignature.png?branch=master
-           :target: https://travis-ci.org/etoccalino/django-rest-framework-httpsignature
+.. image:: https://travis-ci.org/ahknight/drf-httpsig.png?branch=master
+           :target: https://travis-ci.org/ahknight/drf-httpsig
 
 
 Overview
@@ -19,23 +19,9 @@ Installation
 
 Installing the package via the repository::
 
-   pip install djangorestframework-httpsignature
+   pip install drf-httpsig
 
-The current implementation depends on `http_signature by David Lehn`_, who has updated the original code to match the revised spec. This dependency is reflected in the ``REQUIREMENTS.txt`` file, and pip will pull the code from David's repository.
-
-
-Troubleshooting
----------------
-
-It has been reported that some newer versions of pip might download the requiered package http_signature from PyPI instead of the repository listed in REQUIREMENTS.txt. If this is your case, a workaround is:
-
-1. ``git clone https://github.com/etoccalino/django-rest-framework-httpsignature.git``
-2. ``cd django-rest-framework-httpsignature``
-3. remove the whole line in REQUIREMENTS.txt that references **py-http-signature**
-4. ``pip install`` the entire line (including the "-e" at the beginning)
-5. ``pip install -r REQUIREMENTS.txt``
-
-Those steps make explicity what should be automatic. Thanks Alberto Gragera for both spotting the problem and providing a solution.
+The current implementation depends on the `httpsig`_ package, which is a modified version of the `http_signature package by David Lehn`_.
 
 
 Running the tests
@@ -51,25 +37,23 @@ Usage
 To authenticate HTTP requests via HTTP signature, you need to:
 
 1. Install this package in your Django project, as instructed in `Installation`_.
-2. Add ``rest_framework_httpsignature`` to your ``settings.py`` INSTALLED_APPS.
+2. Add ``drf_httpsig`` to your ``settings.py`` INSTALLED_APPS.
 3. In your app code, extend the ``SignatureAuthentication`` class, as follows::
 
     # my_api/auth.py
 
-    from rest_framework_httpsignature.authentication import SignatureAuthentication
+    from drf_httpsig.authentication import SignatureAuthentication
 
     class MyAPISignatureAuthentication(SignatureAuthentication):
         # The HTTP header used to pass the consumer key ID.
-        # Defaults to 'X-Api-Key'.
-        API_KEY_HEADER = 'X-Api-Key'
 
         # A method to fetch (User instance, user_secret_string) from the
         # consumer key ID, or None in case it is not found.
-        def fetch_user_data(self, api_key):
+        def fetch_user_data(self, keyId):
             # ...
             # example implementation:
             try:
-                user = User.objects.get(api_key=api_key)
+                user = User.objects.get(keyId=keyId)
                 return (user, user.secret)
             except User.DoesNotExist:
                 return None
@@ -96,7 +80,6 @@ Roadmap
 =======
 
 - Currently, the library only support HMAC SHA256 for signing.
-- The ``REQUIREMENTS.txt`` file is fairly strict. It is very possible that previous versions of Django and Django REST framework are supported.
 - Since HTTP Signature uses a HTTP header for the request date and time, the authentication class could deal with request expiry.
 
 
@@ -113,18 +96,17 @@ And with much less pain, using the modules ``requests`` and ``http_signature``::
   import requests
   from http_signature.requests_auth import HTTPSignatureAuth
 
-  API_KEY_ID = 'su-key'
+  KEY_ID = 'su-key'
   SECRET = 'my secret string'
 
   signature_headers = ['request-line', 'accept', 'date', 'host']
   headers = {
       'Host': 'localhost:8000',
       'Accept': 'application/json',
-      'X-Api-Key': API_KEY_ID,
   }
 
   # We omit the "Date" header, so http_signature adds it.
-  auth = HTTPSignatureAuth(key_id=API_KEY_ID, secret=SECRET,
+  auth = HTTPSignatureAuth(key_id=KEY_ID, secret=SECRET,
                            algorithm='hmac-sha256',
                            headers=signature_headers)
   req = requests.get('http://localhost:8000/resource/',
@@ -136,4 +118,5 @@ And with much less pain, using the modules ``requests`` and ``http_signature``::
 .. _`HTTP Signature`: https://datatracker.ietf.org/doc/draft-cavage-http-signatures/
 .. _`Django REST framework`: http://django-rest-framework.org/
 .. _`HTTP Signature scheme`: http://docs.aws.amazon.com/general/latest/gr/signature-version-4.html
-.. _`http_signature by David Lehn`: https://github.com/digitalbazaar/py-http-signature
+.. _`httpsig`: https://github.com/ahknight/httpsig
+.. _`http_signature package by David Lehn`: https://github.com/digitalbazaar/py-http-signature

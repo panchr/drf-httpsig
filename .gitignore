@@ -2,4 +2,4 @@
 *.pyc
 dist/
 build/
-djangorestframework_httpsignature.egg-info/
+drf_httpsig.egg-info/

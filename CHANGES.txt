@@ -1,3 +1,11 @@
+vUNTAGGED
+        * Renamed to drf-httpsig because I don't hate my hands.
+        * Updated requirements versions to be more sane.
+        * Switched to a different branch for http_signature.
+        * Removed API_KEY_HEADER in favor of the keyId, per spec.
+        * Cleaned up the repo a bit.
+        * Cleaned up the code a bit.
+
 v0.1.5, 20140613 -- Document installation issue
 
         * Document workaround on installation problems.

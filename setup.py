@@ -2,27 +2,27 @@ from setuptools import setup
 
 
 setup(
-    name='djangorestframework-httpsignature',
-    version='0.1.5',
-    url='https://github.com/etoccalino/django-rest-framework-httpsignature',
+    name='drf-httpsig',
+    version='1.0-dev',
+    url='https://github.com/ahknight/drf-httpsig',
 
     license='LICENSE.txt',
     description='HTTP Signature support for Django REST framework',
     long_description=open('README.rst').read(),
 
     install_requires=[
-        'Django==1.6.2',
-        'djangorestframework==2.3.12',
-        'pycrypto==2.6.1',
-        'http_signature'
+        'Django>=1.6,<1.7'
+        'djangorestframework',
+        'pycrypto',
+        'httpsig'
     ],
     dependency_links=[
-        'https://github.com/etoccalino/py-http-signature/archive/v0.2.0.zip#egg=http_signature-0.2.0',
+        'https://github.com/ahknight/httpsig.git#egg=httpsig',
     ],
 
-    author='Elvio Toccalino',
-    author_email='me@etoccalino.com',
-    packages=['rest_framework_httpsignature'],
+    author='Adam Knight',
+    author_email='adam@movq.us',
+    packages=['drf_httpsig'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',

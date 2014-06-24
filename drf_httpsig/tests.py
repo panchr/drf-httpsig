@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase, TestCase, RequestFactory
 from django.contrib.auth import get_user_model
-from rest_framework_httpsignature.authentication import SignatureAuthentication
+from drf_httpsig.authentication import SignatureAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 import re
 
@@ -41,7 +41,7 @@ class HeadersUnitTestCase(SimpleTestCase):
             self.assertEqual('CONTENT-LENGTH', canon)
 
     def test_header_names(self):
-        headers = ['X-Api-Key', 'Authentication', 'date', 'X-Something-Else']
+        headers = ['Authentication', 'date', 'X-Something-Else']
         for header in headers:
             canon = self.auth.header_canonical(header)
             expected = 'HTTP_%s' % header.upper().replace('-', '_')
@@ -145,14 +145,12 @@ class SignatureAuthenticationTestCase(TestCase):
     class APISignatureAuthentication(SignatureAuthentication):
         """Extend the SignatureAuthentication to test it."""
 
-        API_KEY_HEADER = 'X-Api-Key'
-
         def __init__(self, user):
             self.user = user
 
-        def fetch_user_data(self, api_key):
-            if api_key != KEYID:
-                raise AuthenticationFailed('Bad API key')
+        def fetch_user_data(self, keyid):
+            if keyid != KEYID:
+                raise AuthenticationFailed('Bad key ID')
 
             return (self.user, SECRET)
 
@@ -170,17 +168,9 @@ class SignatureAuthenticationTestCase(TestCase):
         res = self.auth.authenticate(request)
         self.assertIsNone(res)
 
-    def test_only_api_key(self):
-        request = RequestFactory().get(
-            ENDPOINT, {},
-            HTTP_X_API_KEY=KEYID)
-        self.assertRaises(AuthenticationFailed,
-                          self.auth.authenticate, request)
-
     def test_bad_signature(self):
         request = RequestFactory().get(
             ENDPOINT, {},
-            HTTP_X_API_KEY=KEYID,
             HTTP_AUTHORIZATION='some-wrong-value')
         self.assertRaises(AuthenticationFailed,
                           self.auth.authenticate, request)
@@ -197,8 +187,7 @@ class SignatureAuthenticationTestCase(TestCase):
             HTTP_HOST='localhost:8000',
             HTTP_DATE='Mon, 17 Feb 2014 06:11:05 GMT',
             HTTP_ACCEPT='application/json',
-            HTTP_AUTHORIZATION=expected_signature_string,
-            HTTP_X_API_KEY=KEYID)
+            HTTP_AUTHORIZATION=expected_signature_string)
 
         result = self.auth.authenticate(request)
         self.assertIsNotNone(result)

@@ -9,9 +9,9 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.auth',
     'rest_framework',
-    'rest_framework_httpsignature',
+    'drf_httpsig',
 )
 
-ROOT_URLCONF = 'rest_framework_httpsignature.tests'
+ROOT_URLCONF = 'drf_httpsig.tests'
 
 SECRET_KEY = 'MY PRIVATE SECRET'

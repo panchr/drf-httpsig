@@ -31,6 +31,7 @@ To run the tests for the packages, use the following command on the repository r
 
   python manage.py test
 
+
 Usage
 =====
 
@@ -56,7 +57,7 @@ To authenticate HTTP requests via HTTP signature, you need to:
                 user = User.objects.get(keyId=keyId)
                 return (user, user.secret)
             except User.DoesNotExist:
-                return None
+                return (None, None)
 
 
 4. Configure Django REST framework to use you authentication class; e.g.::
@@ -79,7 +80,7 @@ To authenticate HTTP requests via HTTP signature, you need to:
 Roadmap
 =======
 
-- Currently, the library only support HMAC SHA256 for signing.
+- Currently, the library only supports HMAC-SHA256 for signing.
 - Since HTTP Signature uses a HTTP header for the request date and time, the authentication class could deal with request expiry.
 
 
@@ -103,9 +104,9 @@ And with much less pain, using the modules ``requests`` and ``http_signature``::
   headers = {
       'Host': 'localhost:8000',
       'Accept': 'application/json',
+      'Date': "Mon, 17 Feb 2014 06:11:05 GMT"
   }
 
-  # We omit the "Date" header, so http_signature adds it.
   auth = HTTPSignatureAuth(key_id=KEY_ID, secret=SECRET,
                            algorithm='hmac-sha256',
                            headers=signature_headers)

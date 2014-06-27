@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='drf-httpsig',
-    version='1.0-dev',
+    version='1.0b1',
     url='https://github.com/ahknight/drf-httpsig',
 
     license='LICENSE.txt',
@@ -11,8 +11,7 @@ setup(
     long_description=open('README.rst').read(),
 
     install_requires=[
-        'Django>=1.6,<1.7'
-        'djangorestframework',
+        'djangorestframework>=2.3,<2.4',
         'pycrypto',
         'httpsig'
     ],
@@ -24,7 +23,7 @@ setup(
     author_email='adam@movq.us',
     packages=['drf_httpsig'],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',

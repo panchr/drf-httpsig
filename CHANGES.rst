@@ -18,8 +18,8 @@ v1.0b1 (2014-Jun-27)
 * Cleaned up the code a bit.
 
 
-restframework-httpsignature (previous)
---------------------------------------
+djangorestframework-httpsignature (previous)
+--------------------------------------------
 
 v0.1.5, 20140613 -- Document installation issue
 

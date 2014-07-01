@@ -1,13 +1,8 @@
-===========
 drf-httpsig
-===========
-
-.. image:: https://travis-ci.org/ahknight/drf-httpsig.png?branch=master
-           :target: https://travis-ci.org/ahknight/drf-httpsig
-
+-----------
 
 Overview
-========
+--------
 
 Provides `HTTP Signature`_ support for `Django REST framework`_. The HTTP Signature package provides a way to achieve origin authentication and message integrity for HTTP messages. Similar to Amazon's `HTTP Signature scheme`_, used by many of its services. The `HTTP Signature`_ specification is currently an IETF draft.
 
@@ -15,7 +10,7 @@ Provides `HTTP Signature`_ support for `Django REST framework`_. The HTTP Signat
 .. contents::
 
 Installation
-============
+------------
 
 Installing the package via the repository::
 
@@ -25,7 +20,7 @@ The current implementation depends on the `httpsig`_ package, which is a modifie
 
 
 Running the tests
-=================
+-----------------
 
 To run the tests for the packages, use the following command on the repository root directory::
 
@@ -33,7 +28,7 @@ To run the tests for the packages, use the following command on the repository r
 
 
 Usage
-=====
+-----
 
 To authenticate HTTP requests via HTTP signature, you need to:
 
@@ -78,14 +73,14 @@ To authenticate HTTP requests via HTTP signature, you need to:
 
 
 Roadmap
-=======
+-------
 
 - Currently, the library only supports HMAC-SHA256 for signing.
 - Since HTTP Signature uses a HTTP header for the request date and time, the authentication class could deal with request expiry.
 
 
 Example usage & session w/cURL
-==============================
+------------------------------
 
 Assuming the setup detailed in `Usage`_, a project running on ``localhost:8000`` could be probed with cURL as follows::
 

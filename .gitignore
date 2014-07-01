@@ -1,5 +1,7 @@
-*~
+*.egg
 *.pyc
-dist/
+*~
+.tox
 build/
+dist/
 drf_httpsig.egg-info/

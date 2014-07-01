@@ -1,2 +1,4 @@
+# Known to work with these versions. Versions bracketed for safety.
+django>=1.6,<1.7
 djangorestframework>=2.3,<2.4
--e git+https://github.com/ahknight/httpsig.git#egg=httpsig
+httpsig>=1.0b2

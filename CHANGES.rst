@@ -1,11 +1,25 @@
-v1.0, 2014-Jun-27
+drf-httpsig Changes
+-------------------
 
+v1.0b2 (2014-Jul-01)
+~~~~~~~~~~~~~~~~~~~~
+* Added versioneer.
+* Updated requirements to use latest httpsig.
+* Added "setup.py test" and tox support.
+* Fixed a unit test.
+
+v1.0b1 (2014-Jun-27)
+~~~~~~~~~~~~~~~~~~~~
 * Renamed to drf-httpsig because I don't hate my hands.
 * Updated requirements versions to be more sane.
 * Switched to a different branch for http_signature.
 * Removed API_KEY_HEADER in favor of the keyId, per spec.
 * Cleaned up the repo a bit.
 * Cleaned up the code a bit.
+
+
+restframework-httpsignature (previous)
+--------------------------------------
 
 v0.1.5, 20140613 -- Document installation issue
 

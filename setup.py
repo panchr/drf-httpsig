@@ -1,5 +1,20 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 from setuptools import setup, find_packages
+
+# versioneer config
+import versioneer
+versioneer.versionfile_source = 'drf_httpsig/_version.py'
+versioneer.versionfile_build = 'drf_httpsig/_version.py'
+versioneer.tag_prefix = 'v'                     # tags are like v1.2.0
+versioneer.parentdir_prefix = 'drf-httpsig-'    # dirname like 'myproject-1.2.0'
+
+# create long description
+with open('README.rst') as file:
+    long_description = file.read()
+with open('CHANGELOG.rst') as file:
+    long_description += '\n\n' + file.read()
+
+# Tox testing command
 from setuptools.command.test import test as TestCommand
 import sys
 
@@ -19,19 +34,6 @@ class Tox(TestCommand):
         errno = tox.cmdline(args=shlex.split(self.tox_args))
         sys.exit(errno)
 
-# versioneer config
-import versioneer
-versioneer.versionfile_source = 'drf_httpsig/_version.py'
-versioneer.versionfile_build = 'drf_httpsig/_version.py'
-versioneer.tag_prefix = 'v'                     # tags are like v1.2.0
-versioneer.parentdir_prefix = 'drf-httpsig-'    # dirname like 'myproject-1.2.0'
-
-# create long description
-with open('README.rst') as file:
-    long_description = file.read()
-with open('CHANGES.rst') as file:
-    long_description += '\n\n' + file.read()
-
 cmdclass = {'test': Tox}
 cmdclass.update(versioneer.get_cmdclass())
 
@@ -42,15 +44,19 @@ setup(
     description='HTTP Signature support for Django REST framework',
     long_description=long_description,
     classifiers=[
-        'Development Status :: 4 - Beta',
-        'Environment :: Web Environment',
+        "Development Status :: 5 - Production/Stable",
+        "Environment :: Web Environment",
         'Framework :: Django',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Topic :: Internet :: WWW/HTTP',
-        'Topic :: Security',
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.2",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Topic :: Internet :: WWW/HTTP",
+        "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     author='Adam Knight',
     author_email='adam@movq.us',
@@ -59,8 +65,9 @@ setup(
     packages=find_packages(),
     zip_safe=True,
     install_requires=[
+        'django>=1.6,<1.7',
         'djangorestframework>=2.3,<2.4',
-        'httpsig'
+        'httpsig>=1.0.2,<2.0'
     ],
     tests_require=['tox'],
 )

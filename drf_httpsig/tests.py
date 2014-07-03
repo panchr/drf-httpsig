@@ -2,7 +2,7 @@ from django.test import SimpleTestCase, TestCase, RequestFactory
 from django.contrib.auth import get_user_model
 from drf_httpsig.authentication import SignatureAuthentication
 from rest_framework.exceptions import AuthenticationFailed
-import re
+
 
 User = get_user_model()
 
@@ -24,121 +24,6 @@ def build_signature(headers, key_id=KEYID, signature=SIGNATURE):
     }
 
 
-class HeadersTestCase(SimpleTestCase):
-
-    request = RequestFactory()
-
-    def setUp(self):
-        self.auth = SignatureAuthentication()
-
-    def test_special_header_names(self):
-        for special in ['Content-Type', 'CONTENT-TYPE', 'content-type']:
-            canon = self.auth.canonical_header(special)
-            self.assertEqual('CONTENT-TYPE', canon)
-
-        for special in ['Content-Length', 'CONTENT-LENGTH', 'content-length']:
-            canon = self.auth.canonical_header(special)
-            self.assertEqual('CONTENT-LENGTH', canon)
-
-    def test_header_names(self):
-        headers = ['Authentication', 'date', 'X-Something-Else']
-        for header in headers:
-            canon = self.auth.canonical_header(header)
-            expected = 'HTTP_%s' % header.upper().replace('-', '_')
-            self.assertEqual(expected, canon)
-
-    def test_build_signature_for_date(self):
-        req = self.request.get(ENDPOINT, {}, HTTP_X_DATE="some date")
-        dict_to_sign = self.auth.build_dict_to_sign(req, ['date'])
-        self.assertTrue('date' in dict_to_sign.keys())
-
-    def test_build_signature_for_date_and_other(self):
-        req = self.request.get(ENDPOINT, {}, HTTP_X_ACCEPT="*/*",
-                               HTTP_X_DATE="some date")
-        dict_to_sign = self.auth.build_dict_to_sign(req, ['accept', 'date'])
-        self.assertTrue('date' in dict_to_sign.keys())
-        self.assertTrue('accept' in dict_to_sign.keys())
-
-    def test_build_signature_for_request_line(self):
-        req = self.request.get(ENDPOINT, {}, HTTP_X_DATE="some date")
-        dict_to_sign = self.auth.build_dict_to_sign(
-            req,
-            ['(request-line)', 'date'])
-        self.assertTrue('date' in dict_to_sign.keys())
-        self.assertTrue('(request-line)' not in dict_to_sign.keys())
-
-
-class SignatureTestCase(SimpleTestCase):
-
-    def setUp(self):
-        self.auth = SignatureAuthentication()
-
-    def test_no_headers_in_signature(self):
-        signature = build_signature([])
-        self.assertEqual([], self.auth.get_headers_from_signature(signature))
-
-    def test_date_in_signature(self):
-        signature = build_signature(['date'])
-        headers = self.auth.get_headers_from_signature(signature)
-        self.assertTrue('date' in headers)
-
-    def test_many_in_signature(self):
-        signature = build_signature(['date', 'accept', '(request-line)'])
-        headers = self.auth.get_headers_from_signature(signature)
-        self.assertTrue('date' in headers)
-        self.assertTrue('accept' in headers)
-        self.assertTrue('(request-line)' in headers)
-
-    def test_get_signature(self):
-        signature_string = build_signature(['(request-line)', 'date'])
-        fields = self.auth.parse_authorization_header(signature_string)
-        signature = fields['signature']
-        self.assertEqual(SIGNATURE, signature)
-
-    def test_get_signature_without_headers(self):
-        signature_string = build_signature([])
-        fields = self.auth.parse_authorization_header(signature_string)
-        signature = fields['signature']
-        self.assertEqual(SIGNATURE, signature)
-
-
-class BuildSignatureTestCase(SimpleTestCase):
-
-    request = RequestFactory()
-    KEYID = 'su-key'
-
-    def setUp(self):
-        self.auth = SignatureAuthentication()
-
-    def test_build_signature(self):
-        # TO SIGN:
-        #
-        # (request-line): GET /packages/measures/ HTTP/1.1
-        # accept: application/json
-        # date: Mon, 17 Feb 2014 06:11:05 GMT
-        # host: localhost:8000
-
-        headers = ['(request-line)', 'accept', 'date', 'host']
-        expected_signature = 'kIPZjqxzSlODPqdhbZqnjNK9b9pUkyKhe1boKZZ4gbk='
-        expected_signature_string = build_signature(
-            headers,
-            key_id=self.KEYID,
-            signature=expected_signature)
-
-        req = RequestFactory().get(
-            '/packages/measures/', {},
-            HTTP_HOST='localhost:8000',
-            HTTP_DATE='Mon, 17 Feb 2014 06:11:05 GMT',
-            HTTP_ACCEPT='application/json',
-            HTTP_AUTHORIZATION=expected_signature_string)
-
-        signature_string = self.auth.build_signature(
-            self.KEYID, SECRET, req)
-        signature = re.match(
-            '.*signature="(.+?)",?.*', signature_string).group(1)
-        self.assertEqual(expected_signature, signature)
-
-
 class SignatureAuthenticationTestCase(TestCase):
 
     class APISignatureAuthentication(SignatureAuthentication):
@@ -147,7 +32,7 @@ class SignatureAuthenticationTestCase(TestCase):
         def __init__(self, user):
             self.user = user
 
-        def fetch_user_data(self, keyid):
+        def fetch_user_data(self, keyid, algorithm=None):
             if keyid != KEYID:
                 raise AuthenticationFailed('Bad key ID')
 
@@ -162,16 +47,75 @@ class SignatureAuthenticationTestCase(TestCase):
         self.test_user.set_password(self.TEST_PASSWORD)
         self.auth = self.APISignatureAuthentication(self.test_user)
 
-    def test_no_credentials(self):
+    def test_missing_authorization(self):
+        """
+        Return None on missing Authorization header.
+        """
         request = RequestFactory().get(ENDPOINT)
         res = self.auth.authenticate(request)
         self.assertIsNone(res)
 
-    def test_bad_signature(self):
-        request = RequestFactory().get(ENDPOINT, {}, HTTP_AUTHORIZATION='some-wrong-value')
+    def test_foreign_authorization(self):
+        """
+        Return None on unknown Authorization header.
+        """
+        request = RequestFactory().get(ENDPOINT, {}, HTTP_AUTHORIZATION='NotSignature some-relevant-argument')
+        res = self.auth.authenticate(request)
+        self.assertIsNone(res)
+
+    def test_bad_signature_1(self):
+        """
+        Raise AuthenticationFailed on malformed Authorization header.
+        """
+        request = RequestFactory().get(ENDPOINT, {}, HTTP_AUTHORIZATION='Signature some-wrong-value')
         self.assertRaises(AuthenticationFailed, self.auth.authenticate, request)
 
-    def test_can_authenticate(self):
+    def test_bad_signature_2(self):
+        """
+        Raise AuthenticationFailed when missing algorithm argument.
+        """
+        request = RequestFactory().get(ENDPOINT, {}, HTTP_AUTHORIZATION='Signature keyId=foobar,signature=nope')
+        self.assertRaises(AuthenticationFailed, self.auth.authenticate, request)
+
+    def test_bad_signature_3(self):
+        """
+        Raise AuthenticationFailed when missing keyId argument.
+        """
+        request = RequestFactory().get(ENDPOINT, {}, HTTP_AUTHORIZATION='Signature signature=nope,algorithm="hmac-sha256"')
+        self.assertRaises(AuthenticationFailed, self.auth.authenticate, request)
+
+    def test_bad_signature_4(self):
+        """
+        Raise AuthenticationFailed when missing signature argument.
+        """
+        request = RequestFactory().get(ENDPOINT, {}, HTTP_AUTHORIZATION='Signature KeyId=foobar,algorithm="hmac-sha256"')
+        self.assertRaises(AuthenticationFailed, self.auth.authenticate, request)
+
+    def test_invalid_signature(self):
+        """
+        Same test as `valid` but with the headers in a different order.
+        """
+        headers = ['(request-line)', 'accept', 'host', 'date']
+        expected_signature = 'kIPZjqxzSlODPqdhbZqnjNK9b9pUkyKhe1boKZZ4gbk='
+        
+        expected_signature_string = build_signature(
+            headers,
+            key_id=KEYID,
+            signature=expected_signature)
+            
+        request = RequestFactory().get(
+            '/packages/measures/', {},
+            HTTP_HOST='localhost:8000',
+            HTTP_DATE='Mon, 17 Feb 2014 06:11:05 GMT',
+            HTTP_ACCEPT='application/json',
+            HTTP_AUTHORIZATION=expected_signature_string)
+            
+        self.assertRaises(AuthenticationFailed, self.auth.authenticate, request)
+
+    def test_valid_signature(self):
+        """
+        A perfectly valid signature.
+        """
         headers = ['(request-line)', 'accept', 'date', 'host']
         expected_signature = 'kIPZjqxzSlODPqdhbZqnjNK9b9pUkyKhe1boKZZ4gbk='
         expected_signature_string = build_signature(

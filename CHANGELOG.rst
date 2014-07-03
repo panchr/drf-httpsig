@@ -12,7 +12,7 @@ v1.0.1 (2014-Jul-03)
 * Removed models.py -- the client should handle that part entirely.
 
 v1.0b2/1.0.0 (2014-Jul-01)
---------------------
+--------------------------
 
 * Added versioneer.
 * Updated requirements to use latest httpsig.

@@ -103,7 +103,7 @@ Please file any issues in the `issue tracker`_.  You are also welcome to contrib
 Example Usage and Session w/cURL
 --------------------------------
 
-Assuming the setup detailed in `Usage`_, a project running on ``localhost:8000`` could be probed with cURL as follows::
+Assuming the setup detailed above, a project running on ``localhost:8000`` could be probed with cURL as follows::
 
     # Pre-calculate this first bit.
     ~$ SSS=Base64(Hmac(SECRET, "Date: Mon, 17 Feb 2014 06:11:05 GMT", SHA256))

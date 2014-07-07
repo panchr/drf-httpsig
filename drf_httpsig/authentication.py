@@ -107,4 +107,4 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         if not hs.verify():
             raise FAILED            
         
-        return (user, None)
+        return (user, fields["keyid"])

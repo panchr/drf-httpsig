@@ -119,7 +119,7 @@ And, with much less pain, using the modules ``requests`` and ``httpsig``:
     KEY_ID = 'su-key'
     SECRET = 'my secret string'
 
-    signature_headers = ['(request-line)', 'accept', 'date', 'host']
+    signature_headers = ['(request-target)', 'accept', 'date', 'host']
     headers = {
       'Host': 'localhost:8000',
       'Accept': 'application/json',

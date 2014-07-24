@@ -32,11 +32,11 @@ class SignatureAuthentication(authentication.BaseAuthentication):
     authentication for your particular use case:
     
     :param www_authenticate_realm:  Default: "api"
-    :param required_headers:        Default: ["date"]
+    :param required_headers:        Default: ["(request-target)", "date"]
     """
     
     www_authenticate_realm = "api"
-    required_headers = ["date"]
+    required_headers = ["(request-target)", "date"]
     
     def fetch_user_data(self, keyId, algorithm=None):
         """Retuns a tuple (User, secret) or (None, None)."""
@@ -47,7 +47,8 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         DRF sends this for unauthenticated responses if we're the primary
         authenticator.
         """
-        return 'Signature realm="%s"' % self.www_authenticate_realm
+        h = " ".join(required_headers)
+        return 'Signature realm="%s",headers="%s"' % (self.www_authenticate_realm, h)
     
     def authenticate(self, request):
         """

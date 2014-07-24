@@ -67,7 +67,7 @@ setup(
     install_requires=[
         'django>=1.6,<1.7',
         'djangorestframework>=2.3,<2.4',
-        'httpsig>=1.0.2,<2.0'
+        'httpsig>=1.0.2,<1.1'
     ],
     tests_require=['tox'],
 )

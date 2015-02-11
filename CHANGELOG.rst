@@ -1,6 +1,17 @@
 drf-httpsig Changes
 ===================
 
+v1.1.0 (2015-Feb-11)
+--------------------
+
+* Updated to support and require httpsig 1.1.
+* Updated requirements to simply Django<1.7 and DRF<3.0. Last version for those, I suspect.
+
+v1.0.2 (2014-Jul-24)
+--------------------
+
+* Updated authentication return value to set request.auth to the key_id used.
+
 v1.0.1 (2014-Jul-03)
 --------------------
 

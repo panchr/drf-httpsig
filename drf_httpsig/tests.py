@@ -96,7 +96,7 @@ class SignatureAuthenticationTestCase(TestCase):
         Same test as `valid` but with the headers in a different order.
         """
         headers = ['(request-target)', 'accept', 'host', 'date']
-        expected_signature = 'kIPZjqxzSlODPqdhbZqnjNK9b9pUkyKhe1boKZZ4gbk='
+        expected_signature = 'SelruOP39OWoJrSopfYJ99zOLoswmpyGXyDPdebeELc='
         
         expected_signature_string = build_signature(
             headers,
@@ -117,7 +117,7 @@ class SignatureAuthenticationTestCase(TestCase):
         A perfectly valid signature.
         """
         headers = ['(request-target)', 'accept', 'date', 'host']
-        expected_signature = 'kIPZjqxzSlODPqdhbZqnjNK9b9pUkyKhe1boKZZ4gbk='
+        expected_signature = 'SelruOP39OWoJrSopfYJ99zOLoswmpyGXyDPdebeELc='
         expected_signature_string = build_signature(
             headers,
             key_id=KEYID,

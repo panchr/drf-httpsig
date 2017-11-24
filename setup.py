@@ -65,8 +65,8 @@ setup(
     packages=find_packages(),
     zip_safe=True,
     install_requires=[
-        'django<1.7',
-        'djangorestframework<3.0',
+        'django<=1.11',
+        'djangorestframework<=3.7',
         'httpsig>=1.1'
     ],
     tests_require=['tox'],

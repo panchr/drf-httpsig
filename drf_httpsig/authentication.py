@@ -47,7 +47,7 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         DRF sends this for unauthenticated responses if we're the primary
         authenticator.
         """
-        h = " ".join(required_headers)
+        h = " ".join(self.required_headers)
         return 'Signature realm="%s",headers="%s"' % (self.www_authenticate_realm, h)
     
     def authenticate(self, request):

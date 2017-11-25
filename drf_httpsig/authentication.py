@@ -16,7 +16,6 @@ Reusing failure exceptions serves several purposes:
     or memory usage in high-volume attack scenarios.
 
 """
-FAILED = exceptions.AuthenticationFailed('Invalid signature.')
 
 class SignatureAuthentication(authentication.BaseAuthentication):
     """
@@ -70,11 +69,11 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         
         # Verify basic header structure.
         if len(fields) == 0:
-            raise FAILED
+            raise exceptions.AuthenticationFailed('Header fields not present.')
         
         # Ensure all required fields were included.
         if len(set(("keyid","algorithm","signature")) - set(fields.keys())) > 0:
-            raise FAILED
+            raise exceptions.AuthenticationFailed('Required fields not present.')
         
         # Fetch the secret associated with the keyid
         user, secret = self.fetch_user_data(
@@ -83,7 +82,7 @@ class SignatureAuthentication(authentication.BaseAuthentication):
             )
         
         if not (user and secret):
-            raise FAILED
+            raise exceptions.AuthenticationFailed('Invalid signature.')
         
         # Gather all request headers and translate them as stated in the Django docs:
         # https://docs.djangoproject.com/en/1.6/ref/request-response/#django.http.HttpRequest.META
@@ -106,6 +105,6 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         
         # All of that just to get to this.
         if not hs.verify():
-            raise FAILED            
+            raise exceptions.AuthenticationFailed('Invalid signature.')
         
         return (user, fields["keyid"])
